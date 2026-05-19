@@ -6,59 +6,130 @@ import com.miguel.hibernate.services.ClienteService;
 import com.miguel.hibernate.services.ClienteServiceImpl;
 import com.miguel.hibernate.util.JpaUtil;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Scanner;
 
 public class HibernateCrudService {
+  private static EntityManager em;
+
+  private static ClienteService service;
+
+  private static List<Cliente> listClientes;
+
+  private static Scanner scanner;
+
   public static void main(String[] args) {
 
-    EntityManager em = JpaUtil.getEntityManager();
+    em = JpaUtil.getEntityManager();
+    service = new ClienteServiceImpl(em);
+    listClientes = Arrays.asList(
+        new Cliente(null, "Miguel", "Ordoñez", "Mercado Pago"),
+        new Cliente(null, "Antonio", "Camara", "Debito"),
+        new Cliente(null, "Juan", "Varguez", "Credito"),
+        new Cliente(null, "Maria", "Camara", "Prestamo"),
+        new Cliente(null, "Mariana", "Ordoñez", "Efectivo"),
+        new Cliente(null, "Carmen", "Casanova", "PayPal"),
+        new Cliente(null, "Andres", "Chi", "Mercado Pago"));
 
-    ClienteService service = new ClienteServiceImpl(em);
+    scanner = new Scanner(System.in);
 
-    System.out.println("========== listar ==========");
-    List<Cliente> clientes = service.listar();
-    clientes.forEach(System.out::println);
+    boolean estaActivo = true;
+    int op = 0;
+    do {
 
-    System.out.println("========== obtener por id ==========");
-    Optional<Cliente> optionalCliente = service.porId(1L);
-    optionalCliente.ifPresent(System.out::println);
+      try {
+        System.out.println("1. Por ID");
+        System.out.println("2. Listar");
+        System.out.println("3. Eliminar");
+        System.out.println("4. Editar");
+        System.out.println("5. Agregar");
+        System.out.println("6. Salir");
+        op = scanner.nextInt();
 
-    System.out.println("========== insertar nuevo cliente ===========");
-    Cliente cliente = new Cliente();
-    cliente.setNombre("Luci");
-    cliente.setApellido("Mena");
-    cliente.setFormaPago("paypal");
+        switch (op) {
+          case 1:
+            byId();
+            break;
+          case 2:
+            list();
+            break;
+          case 3:
+            delete();
+            break;
+          case 4:
+            edit();
+            break;
+          case 5:
+            add();
+            break;
 
-    service.guardar(cliente);
-    System.out.println("cliente guardado con exito");
-    service.listar().forEach(System.out::println);
+          default:
+            estaActivo = false;
+        }
 
-    System.out.println("=========== editar cliente ==========");
-    Long id = cliente.getId();
-    optionalCliente = service.porId(id);
-    optionalCliente.ifPresent(c -> {
-      c.setFormaPago("mercado pago");
-      service.guardar(c);
-      System.out.println("cliente editado con exito!");
-      service.listar().forEach(System.out::println);
-    });
-
-    System.out.println("========== eliminar cliente ===========");
-    id = cliente.getId();
-    optionalCliente = service.porId(id);
-    optionalCliente.ifPresent(c -> {
-      service.eliminar(c.getId());
-      System.out.println("cliente eliminado con exito!");
-      service.listar().forEach(System.out::println);
-    });
-
-    /*
-     * if (optionalCliente.isPresent()) {
-     * service.eliminar(id);
-     * }
-     */
+      } catch (Exception e) {
+        System.err.println("Ocurrio un error");
+        e.printStackTrace();
+        return;
+      }
+    } while (estaActivo);
 
     em.close();
+    scanner.close();
+  }
+
+  public static void add() {
+    System.out.println("========== Agregar ===========");
+    Cliente cliente = listClientes.get(getIndex());
+    service.guardar(cliente);
+    System.out.println("cliente guardado con exito\n");
+  }
+
+  public static void edit() {
+    System.out.println("=========== Editar ==========");
+    Long id = 0L;
+    System.out.print("Ingrese el Id a Editar: ");
+    id = scanner.nextLong();
+    Optional<Cliente> optionalCliente = service.porId(id);
+    optionalCliente.ifPresentOrElse(c -> {
+      c.setFormaPago(listClientes.get(getIndex()).getFormaPago() + "-" + String.valueOf(getIndex()));
+      service.guardar(c);
+      System.out.println("Cliente editado con exito!\n");
+    }, () -> System.out.println("No se encontro el id\n"));
+  }
+
+  public static void delete() {
+    System.out.println("========== Eliminar ===========");
+    Long id = 0L;
+    System.out.print("Ingrese el Id a Eliminar: ");
+    id = scanner.nextLong();
+    Optional<Cliente> optionalCliente = service.porId(id);
+    optionalCliente.ifPresentOrElse(c -> {
+      service.eliminar(c.getId());
+      System.out.println("Cliente eliminado con exito!\n");
+    }, () -> System.out.println("No se encontro el id\n"));
+  }
+
+  public static void list() {
+    System.out.println("========== Listar ==========");
+    List<Cliente> clientes = service.listar();
+    clientes.forEach(System.out::println);
+    System.out.println("");
+  }
+
+  public static void byId() {
+    System.out.println("========== PorID ==========");
+    Long id = 0L;
+    System.out.print("Ingrese el Id a Eliminar: ");
+    id = scanner.nextLong();
+    Optional<Cliente> optionalCliente = service.porId(id);
+    optionalCliente.ifPresentOrElse(System.out::println, () -> System.out.println("No se encontro el id"));
+    System.out.println("");
+  }
+
+  public static int getIndex() {
+    return (int) Math.floor(Math.random() * listClientes.size());
   }
 }

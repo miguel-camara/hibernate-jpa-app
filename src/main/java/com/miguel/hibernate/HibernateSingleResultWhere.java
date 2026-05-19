@@ -18,9 +18,17 @@ public class HibernateSingleResultWhere {
     String pago = s.next();
     query.setParameter(1, pago);
     query.setMaxResults(1);
-    Cliente c = (Cliente) query.getSingleResult();
-    System.out.println(c);
-    em.close();
-    s.close();
+    try {
+      Cliente c = (Cliente) query.getSingleResult();
+      System.out.println(c);
+
+    } catch (Exception e) {
+      System.out.println("No hay resultado");
+
+    } finally {
+
+      em.close();
+      s.close();
+    }
   }
 }

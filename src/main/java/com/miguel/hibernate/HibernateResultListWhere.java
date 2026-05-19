@@ -18,9 +18,15 @@ public class HibernateResultListWhere {
     System.out.println("Ingrese una forma de pago: ");
     String pago = s.next();
     query.setParameter(1, pago);
+
     // query.setMaxResults(1);
     List<Cliente> clientes = query.getResultList();
-    System.out.println(clientes);
+    if (clientes.size() > 0) {
+
+      System.out.println(clientes);
+    } else {
+      System.out.println("No hay coincidencias");
+    }
     em.close();
     s.close();
   }

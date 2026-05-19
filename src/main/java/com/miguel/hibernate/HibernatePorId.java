@@ -16,10 +16,18 @@ public class HibernatePorId {
     Long id = s.nextLong();
     EntityManager em = JpaUtil.getEntityManager();
     Cliente cliente = em.find(Cliente.class, id);
-    System.out.println(cliente);
+    if (cliente != null) {
+      System.out.println(cliente);
+    } else {
+      System.out.println("No hay resultados");
+    }
 
     Cliente cliente2 = em.find(Cliente.class, id);
-    System.out.println(cliente2);
+    if (cliente2 != null) {
+      System.out.println(cliente2);
+    } else {
+      System.out.println("No hay resultados");
+    }
 
     s.close();
     em.close();
