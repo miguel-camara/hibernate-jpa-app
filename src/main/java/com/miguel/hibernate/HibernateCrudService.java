@@ -122,7 +122,7 @@ public class HibernateCrudService {
   public static void byId() {
     System.out.println("========== PorID ==========");
     Long id = 0L;
-    System.out.print("Ingrese el Id a Eliminar: ");
+    System.out.print("Ingrese el Id a buscar: ");
     id = scanner.nextLong();
     Optional<Cliente> optionalCliente = service.porId(id);
     optionalCliente.ifPresentOrElse(System.out::println, () -> System.out.println("No se encontro el id"));
