@@ -37,9 +37,9 @@ public class HibernateCrudService {
 
     boolean estaActivo = true;
     int op = 0;
-    do {
+    try {
+      do {
 
-      try {
         System.out.println("1. Por ID");
         System.out.println("2. Listar");
         System.out.println("3. Eliminar");
@@ -69,15 +69,16 @@ public class HibernateCrudService {
             estaActivo = false;
         }
 
-      } catch (Exception e) {
-        System.err.println("Ocurrio un error");
-        e.printStackTrace();
-        return;
-      }
-    } while (estaActivo);
+      } while (estaActivo);
+    } catch (Exception e) {
+      System.err.println("Ocurrio un error");
+      e.printStackTrace();
+    } finally {
+      scanner.close();
+      em.close();
 
-    em.close();
-    scanner.close();
+    }
+
   }
 
   public static void add() {

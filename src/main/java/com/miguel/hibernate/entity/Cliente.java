@@ -1,5 +1,8 @@
 package com.miguel.hibernate.entity;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -14,6 +17,9 @@ public class Cliente {
 
   @Column(name = "forma_pago")
   private String formaPago;
+
+  @Embedded
+  private Auditoria audit = new Auditoria();
 
   public Cliente() {
   }
@@ -64,7 +70,21 @@ public class Cliente {
 
   @Override
   public String toString() {
-    return "Cliente [id=" + id + ", nombre=" + nombre + ", apellido=" + apellido + ", formaPago=" + formaPago + "]";
-  }
 
+    LocalDateTime creado = audit == null ? null : audit.getCreadoEn();
+    LocalDateTime editado = audit == null ? null : audit.getEditadoEn();
+    // LocalDateTime creado =
+    // Optional.ofNullable(this.audit.getCreadoEn()).orElse(null);
+    // LocalDateTime editado =
+    // Optional.ofNullable(this.audit.getEditadoEn()).orElse(null);
+
+    return "id=" + id +
+        ", nombre='" + nombre + '\'' +
+        ", apellido='" + apellido + '\'' +
+        ", formaPago='" + formaPago + '\'' +
+        ", creadoEn='" + creado + '\'' +
+        ", editadoEn='" + editado + '\'';
+
+    // ", formaPago='" + formaPago + '\'';
+  }
 }
